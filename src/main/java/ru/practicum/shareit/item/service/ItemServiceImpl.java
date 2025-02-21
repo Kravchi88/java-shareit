@@ -32,7 +32,7 @@ public class ItemServiceImpl implements ItemService {
         Item existingItem = itemStorage.findById(itemId);
 
         if (existingItem.getOwnerId() != userId) {
-            throw new ForbiddenException("Access denied");
+            throw new ForbiddenException("Access denied. Only owner can update their items");
         }
 
         Item updatedItem = new Item(

@@ -23,19 +23,20 @@ import java.util.Collection;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
+    private static final String REQUEST_HEADER = "X-Sharer-User-Id";
     private final ItemService service;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ItemDto createItem(
-            @RequestHeader("X-Sharer-User-Id") final long userId,
+            @RequestHeader(REQUEST_HEADER) final long userId,
             @Valid @RequestBody final ItemDto itemDto) {
         return service.createItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(
-            @RequestHeader("X-Sharer-User-Id") final long userId,
+            @RequestHeader(REQUEST_HEADER) final long userId,
             @PathVariable("itemId") final long itemId,
             @RequestBody final ItemPatchDto itemDto) {
         return service.updateItem(userId, itemId, itemDto);
@@ -47,7 +48,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<ItemDto> getUserItems(@RequestHeader("X-Sharer-User-Id") final long userId) {
+    public Collection<ItemDto> getUserItems(@RequestHeader(REQUEST_HEADER) final long userId) {
         return service.getUserItems(userId);
     }
 
