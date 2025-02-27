@@ -4,7 +4,7 @@ public record ItemPatchDto(
         Long id,
         String name,
         String description,
-        boolean available,
-        long ownerId,
+        Boolean available,
+        Long ownerId,
         Long requestId
 ) {}

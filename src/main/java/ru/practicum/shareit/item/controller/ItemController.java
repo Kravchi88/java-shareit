@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collection;
@@ -43,17 +46,28 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable("itemId") final long itemId) {
-        return service.getItem(itemId);
+    public ItemResponseDto getItem(
+            @RequestHeader(REQUEST_HEADER) final long userId,
+            @PathVariable("itemId") final long itemId) {
+        return service.getItemById(userId, itemId);
     }
 
     @GetMapping
-    public Collection<ItemDto> getUserItems(@RequestHeader(REQUEST_HEADER) final long userId) {
+    public Collection<ItemResponseDto> getUserItems(@RequestHeader(REQUEST_HEADER) final long userId) {
         return service.getUserItems(userId);
     }
 
     @GetMapping("/search")
     public Collection<ItemDto> searchItems(@RequestParam("text") final String text) {
         return service.searchItems(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto addComment(
+            @RequestHeader(REQUEST_HEADER) final long userId,
+            @PathVariable("itemId") final long itemId,
+            @RequestBody final CommentRequestDto commentRequestDto) {
+        return service.addComment(userId, itemId, commentRequestDto.text());
     }
 }

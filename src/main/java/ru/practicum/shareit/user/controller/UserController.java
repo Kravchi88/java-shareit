@@ -16,7 +16,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserPatchDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -25,27 +25,29 @@ public class UserController {
     private final UserService service;
 
     @GetMapping
-    public Collection<UserDto> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return service.getAllUsers();
     }
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable("userId") final long id) {
-        return service.getUser(id);
+        return service.getUserById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@Valid @RequestBody final UserDto userDto) {
-        return service.addUser(userDto);
+        return service.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
     public UserDto updateUser(@PathVariable("userId") final long id, @Valid @RequestBody UserPatchDto userDto) {
         return service.updateUser(id, userDto);
     }
 
     @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable("userId") final long id) {
         service.deleteUser(id);
     }
