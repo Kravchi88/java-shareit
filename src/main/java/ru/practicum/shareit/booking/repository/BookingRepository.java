@@ -33,23 +33,23 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     boolean existsByBookerIdAndItemIdAndEndBefore(Long bookerId, Long itemId, LocalDateTime now);
 
-    @Query( """
+    @Query("""
             SELECT b FROM Booking b
             WHERE b.item.id = :itemId
              AND b.status = 'APPROVED'
              AND b.end < CURRENT_TIMESTAMP
             ORDER BY b.end DESC
             LIMIT 1
-            """)
+           """)
     Optional<Booking> findLastBooking(@Param("itemId") Long itemId);
 
-    @Query( """
+    @Query("""
             SELECT b FROM Booking b
             WHERE b.item.id = :itemId
              AND b.status = 'APPROVED'
              AND b.start > CURRENT_TIMESTAMP
             ORDER BY b.start ASC
             LIMIT 1
-            """)
+           """)
     Optional<Booking> findNextBooking(@Param("itemId") Long itemId);
 }
