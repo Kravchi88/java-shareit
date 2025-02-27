@@ -52,4 +52,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             LIMIT 1
            """)
     Optional<Booking> findNextBooking(@Param("itemId") Long itemId);
+
+    @Query("""
+            SELECT b FROM Booking b
+            WHERE b.item.id IN :itemIds
+             AND b.status = :status
+           """)
+    List<Booking> findAllByItemIdInAndStatus(@Param("itemIds") List<Long> itemIds, @Param("status") Booking.BookingStatus status);
 }

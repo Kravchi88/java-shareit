@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-/*import jakarta.validation.constraints.FutureOrPresent;*/
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -32,7 +31,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"item", "booker"})
-@EqualsAndHashCode(exclude = {"item", "booker"})
+@EqualsAndHashCode(exclude = {"item", "booker", "status", "start", "end"})
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Booking {
 
@@ -41,11 +40,9 @@ public class Booking {
     @Column(name = "bookings_id")
     Long id;
 
-    /*@FutureOrPresent*/
     @Column(name = "bookings_start_date", nullable = false, updatable = false)
     LocalDateTime start;
 
-    /*@FutureOrPresent*/
     @Column(name = "bookings_end_date", nullable = false, updatable = false)
     LocalDateTime end;
 

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -23,7 +24,9 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,20 +96,41 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemResponseDto> getUserItems(Long userId) {
         checkUserExists(userId);
 
-        return itemRepository.findAllByOwnerId(userId)
-                .stream()
+        List<Item> items = itemRepository.findAllByOwnerId(userId);
+        List<Long> itemIds = items.stream()
+                .map(Item::getId)
+                .toList();
+
+        List<Booking> bookings = bookingRepository.findAllByItemIdInAndStatus(itemIds, Booking.BookingStatus.APPROVED);
+        List<Comment> comments = commentRepository.findAllByItemIdIn(itemIds);
+
+        Map<Long, List<Booking>> bookingsByItem = bookings.stream()
+                .collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
+        Map<Long, List<Comment>> commentsByItem = comments.stream()
+                .collect(Collectors.groupingBy(comment -> comment.getItem().getId()));
+
+        return items.stream()
                 .map(item -> {
-                    BookingShortDto lastBooking = bookingRepository.findLastBooking(item.getId())
+                    List<Booking> itemBookings = bookingsByItem.getOrDefault(item.getId(), List.of());
+                    List<Comment> itemComments = commentsByItem.getOrDefault(item.getId(), List.of());
+
+                    BookingShortDto lastBooking = itemBookings.stream()
+                            .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                            .max(Comparator.comparing(Booking::getEnd))
                             .map(BookingMapper::toBookingShortDto)
                             .orElse(null);
-                    BookingShortDto nextBooking = bookingRepository.findNextBooking(item.getId())
+
+                    BookingShortDto nextBooking = itemBookings.stream()
+                            .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                            .min(Comparator.comparing(Booking::getStart))
                             .map(BookingMapper::toBookingShortDto)
                             .orElse(null);
-                    List<CommentDto> comments = commentRepository.findByItemId(item.getId())
-                            .stream()
+
+                    List<CommentDto> commentsDto = itemComments.stream()
                             .map(CommentMapper::toCommentDto)
                             .toList();
-                    return ItemMapper.toItemResponseDto(item, lastBooking, nextBooking, comments);
+
+                    return ItemMapper.toItemResponseDto(item, lastBooking, nextBooking, commentsDto);
                 })
                 .toList();
     }
