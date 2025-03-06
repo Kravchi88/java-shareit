@@ -11,6 +11,6 @@ public record ItemDto(
         String description,
         @NotNull
         Boolean available,
-        long ownerId,
+        Long ownerId,
         Long requestId
 ) {}
