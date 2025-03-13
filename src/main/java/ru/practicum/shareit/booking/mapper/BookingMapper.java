@@ -29,7 +29,7 @@ public class BookingMapper {
                 booking.getEnd(),
                 booking.getStatus(),
                 new UserShortDto(booking.getBooker().getId()),
-                new ItemShortDto(booking.getItem().getId(), booking.getItem().getName())
+                new ItemShortDto(booking.getItem().getId(), booking.getItem().getName(), booking.getItem().getOwner().getId())
         );
     }
 
